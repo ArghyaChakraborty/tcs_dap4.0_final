@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  zookeeper:
+    image: 'docker.io/bitnami/zookeeper:3-debian-10'
+    ports:
+      - '2181:2181'
+    volumes:
+      - 'zookeeper_data:/bitnami'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - backend
+  
+  kafka:
+    image: 'docker.io/bitnami/kafka:2-debian-10'
+    ports:
+      - '9092:9092'
+    volumes:
+      - 'kafka_data:/bitnami'
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+    depends_on:
+      - zookeeper
+    networks:
+      - backend
+
+  mongodb:
+    image: 'docker.io/bitnami/mongodb:4.4-debian-10'
+    ports:
+      - "27017:27017"
+    volumes:
+      - 'mongodb_data:/bitnami/mongodb'
+    environment:
+      # Password for user "root"
+      - MONGODB_ROOT_PASSWORD=mongoroot
+      - MONGODB_DATABASE=loanservice
+      - MONGODB_USERNAME=mongouser
+      - MONGODB_PASSWORD=mongopassword
+    networks:
+      - backend
+
+  postgresql:
+    image: 'docker.io/bitnami/postgresql:11-debian-10'
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+    environment:
+      # Password for user "postgres"
+      - POSTGRESQL_PASSWORD=postgresroot
+      - POSTGRESQL_DATABASE=emiservice
+      - POSTGRESQL_USERNAME=postgresuser
+      - POSTGRESQL_PASSWORD=postgrespassword
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+  mongodb_data:
+    driver: local
+  postgresql_data:
+    driver: local
