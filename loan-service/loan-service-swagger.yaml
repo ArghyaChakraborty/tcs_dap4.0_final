@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: TCS DAP 4.0 Loan Service REST APIs
+  version: 1.0.0
+paths:
+  /loan/:
+    get:
+      description: Retrieves all the loans in the system
+      responses:
+        200:
+          description: Returns all the loans in the system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan-Response-Array'
+    post:
+      description: Creates a new loan
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Loan-Request'
+      responses:
+        201:
+          description: Returns created loan id
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Saved Loan details with Id: 123"
+        500:
+          description: Returns error in cas ethe loan could not be saved
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Failed to save Loan details : Custom Error Message"        
+  /loan/{loanId}:
+    get:
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: string
+            example: 123
+      description: Retrieves details about a single loan
+      responses:
+        200:
+          description: Returns a specific loan in the system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan-Response'     
+        404:
+          description: Returned when no request with specifid id is found
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "No Loan with id: 123 found"
+    delete:
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: string
+            example: 123
+      description: Deletes a single loan
+      responses:
+        200:
+          description: Deletes a specific loan
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Deleted Loan details with Id: 123"
+        500:
+          description: Returned when there is some error deleting the loan
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Failed to delete Loan details : Custom Error Message"
+  
+components:
+  schemas:
+    Loan-Request:
+      type: object
+      description: Loan Object
+      properties:
+        borrowerDetails:
+          type: string
+          example: Test Borrowser Details
+        loanAmount:
+          type: number
+          example: 100.0
+        loanDurationYears:
+          type: number
+          example: 1
+        mortgageDetails:
+          type: string
+          example: Test Mortgage Details
+    Loan-Response:
+      type: object
+      description: Loan Object
+      properties:
+        loanId:
+          type: string
+          example: 1234
+        borrowerDetails:
+          type: string
+          example: Test Borrowser Details
+        loanAmount:
+          type: number
+          example: 100.0
+        loanDurationYears:
+          type: number
+          example: 1
+        mortgageDetails:
+          type: string
+          example: Test Mortgage Details
+    Loan-Response-Array:
+      type: array
+      description: Array of Loan Responses
+      items:
+        $ref: '#/components/schemas/Loan-Response'
+  
