@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class Producer {
     @Value(value = "${message.topic.name}")
@@ -16,13 +19,15 @@ public class Producer {
     @Autowired
     private KafkaTemplate<String, Loan> kafkaTemplate;
 
+    private static final Logger logger = LoggerFactory.getLogger(Producer.class);
+
     public void sendMessage(Loan loan) {
-        System.out.println("Sending TOPIC: "+TOPIC+" Message: "+loan);
+        logger.debug("Sending TOPIC: "+TOPIC+" Message: "+loan);
         try {
             this.kafkaTemplate.send(TOPIC, loan);
-            System.out.println("Successfuly Sent TOPIC: "+TOPIC+" Message: "+loan);
+            logger.debug("Successfuly Sent TOPIC: "+TOPIC+" Message: "+loan);
         } catch(Exception ex) {
-            System.out.println("ERROR Sending TOPIC: "+TOPIC+" Message: "+loan+" Error Message: "+ex.getMessage());
+            logger.error("ERROR Sending TOPIC: "+TOPIC+" Message: "+loan+" Error Message: "+ex.getMessage());
         }
         
     }

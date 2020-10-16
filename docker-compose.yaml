@@ -16,13 +16,15 @@ services:
     image: 'docker.io/bitnami/kafka:2-debian-10'
     ports:
       - '9092:9092'
+      - '29092:29092'
     volumes:
       - 'kafka_data:/bitnami'
     environment:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
     depends_on:
       - zookeeper
     networks:
@@ -44,17 +46,60 @@ services:
       - backend
 
   postgresql:
-    image: 'docker.io/bitnami/postgresql:11-debian-10'
+    image: 'postgres:9.6'
     ports:
       - '5432:5432'
     volumes:
-      - 'postgresql_data:/bitnami/postgresql'
+      - 'postgresql_data:/var/lib/postgresql/data'
     environment:
-      # Password for user "postgres"
-      - POSTGRESQL_PASSWORD=postgresroot
-      - POSTGRESQL_DATABASE=emiservice
-      - POSTGRESQL_USERNAME=postgresuser
-      - POSTGRESQL_PASSWORD=postgrespassword
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresroot
+      POSTGRES_DB: emiservice
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - backend
+
+  loan-service:
+    build: ./loan-service/
+    image: 'loan-service:latest'
+    ports:
+      - '9000:9000'
+    environment:
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+      KAFKA_TOPIC: loan
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: mongouser
+      MONGODB_PASSWORD: mongopassword
+      MONGODB_DB: loanservice
+    networks:
+      - backend
+    depends_on:
+      - zookeeper
+      - kafka
+      - mongodb
+
+  emi-service:
+    build: ./emi-service/
+    image: 'emi-service:latest'
+    ports:
+      - '9010:9010'
+    environment:
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+      KAFKA_TOPIC: loan
+      POSTGRES_HOST: postgresql
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresroot
+      POSTGRES_DB: emiservice
+    networks:
+      - backend
+    depends_on:
+      - zookeeper
+      - kafka
+      - postgresql
+      - loan-service
 
 networks:
   backend:

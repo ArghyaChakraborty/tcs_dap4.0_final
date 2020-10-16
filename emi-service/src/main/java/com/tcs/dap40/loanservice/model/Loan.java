@@ -1,15 +1,7 @@
 package com.tcs.dap40.loanservice.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection = "loan")
 public class Loan {
-    @Transient
-    public static final String SEQUENCE_NAME = "loan_sequence";
 
-    @Id
     private Long loanId;
     private String borrowerDetails;
     private Double loanAmount;
@@ -20,7 +12,8 @@ public class Loan {
     public Loan() {
     }
 
-    public Loan(String borrowerDetails, Double loanAmount, Double loanDurationYears, Double rateOfInterestPerAnnum, String mortgageDetails) {
+    public Loan(Long loanId, String borrowerDetails, Double loanAmount, Double loanDurationYears, Double rateOfInterestPerAnnum, String mortgageDetails) {
+        this.loanId = loanId;
         this.borrowerDetails = borrowerDetails;
         this.loanAmount = loanAmount;
         this.loanDurationYears = loanDurationYears;

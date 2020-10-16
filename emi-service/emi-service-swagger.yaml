@@ -1,0 +1,141 @@
+openapi: 3.0.0
+info:
+  title: TCS DAP 4.0 EMI Service REST APIs
+  version: 1.0.0
+paths:
+  /emi/{loanId}:
+    post:
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EMI-Request'
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: integer
+            example: 123
+      description: Pays an EMI Amount for a given Loan
+      responses:
+        201:
+          description: Returns a the EMI Id generated
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Saving EMI for Loan Id 123 EMI Id: 1234"
+        500:
+          description: Returned when no loan with specifid id is found OR when some error occures while saving the EMI amount
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Exception saving EMI for Loan id 123 Error: Custom Error Message"
+
+  /emi/{loanId}/paid-emis:
+    get:
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: integer
+            example: 123
+      description: Returns the EMIs paid against the loan
+      responses:
+        200:
+          description: Returns the EMIs paid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EMI-Response-Array'
+        500:
+          description: Returned when no loan with specifid id is found OR when some error occures while fetching EMIs
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Exception retrieving Paid EMIs for loan id 123 Error: Custom Error Message"
+                
+  /emi/{loanId}/next-emi:
+    get:
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: integer
+            example: 123
+      description: Returns the Next EMI Amount
+      responses:
+        200:
+          description: Returns the EMI amount to be paid
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Next EMI Amount for Loan Id: 123 : 100.0"
+        500:
+          description: Returned when no loan with specifid id is found OR when some error occures while fetching EMIs
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Exception retrieving Paid EMIs for loan id 123 Error: Custom Error Message"
+                
+  /emi/{loanId}/remaining-balance:
+    get:
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: integer
+            example: 123
+      description: Returns the remaining loan balance
+      responses:
+        200:
+          description: Returns the remaining Loan amount
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Remaining Balance for Loan Id: 123 : 1200.0"
+        500:
+          description: Returned when no loan with specifid id is found OR when some error occures while fetching EMIs
+          content:
+            application/text:
+              schema:
+                type: string
+                example: "Exception retrieving Paid EMIs for loan id 123 Error: Custom Error Message"
+  
+components:
+  schemas:
+    EMI-Request:
+      type: object
+      description: EMI Payment
+      properties:
+        emiPayment:
+          type: number
+          example: 100.0
+    EMI-Response:
+      type: object
+      description: EMI Payment
+      properties:
+        emiId:
+          type: integer
+          example: 1234
+        emiPaymentDate:
+          type: string
+          example: "2020-10-16T21:18:31.910+00:00"
+        emiPayment:
+          type: number
+          example: 100.0
+    EMI-Response-Array:
+      type: array
+      description: Array of EMIs
+      items:
+        $ref: '#/components/schemas/EMI-Response'
+  

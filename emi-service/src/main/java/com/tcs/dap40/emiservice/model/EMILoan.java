@@ -1,14 +1,18 @@
-package com.tcs.dap40.loanservice.model;
+package com.tcs.dap40.emiservice.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.List;
 
-@Document(collection = "loan")
-public class Loan {
-    @Transient
-    public static final String SEQUENCE_NAME = "loan_sequence";
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
+import com.tcs.dap40.loanservice.model.Loan;
+
+import java.util.LinkedList;
+
+@Entity
+public class EMILoan {
     @Id
     private Long loanId;
     private String borrowerDetails;
@@ -16,16 +20,30 @@ public class Loan {
     private Double loanDurationYears;
     private Double rateOfInterestPerAnnum;
     private String mortgageDetails;
+    @OneToMany(mappedBy="loan", fetch=FetchType.LAZY)
+    private List<EMI> paidEmis;
 
-    public Loan() {
+    public EMILoan() {
+        this.paidEmis = new LinkedList<EMI>();
     }
 
-    public Loan(String borrowerDetails, Double loanAmount, Double loanDurationYears, Double rateOfInterestPerAnnum, String mortgageDetails) {
+    public EMILoan(Long loanId, String borrowerDetails, Double loanAmount, Double loanDurationYears, Double rateOfInterestPerAnnum, String mortgageDetails) {
+        this();
+        this.loanId = loanId;
         this.borrowerDetails = borrowerDetails;
         this.loanAmount = loanAmount;
         this.loanDurationYears = loanDurationYears;
         this.rateOfInterestPerAnnum = rateOfInterestPerAnnum;
         this.mortgageDetails = mortgageDetails;
+    }
+
+    public EMILoan(Loan loan) {
+        this.loanId = loan.getLoanId();
+        this.borrowerDetails = loan.getBorrowerDetails();
+        this.loanAmount = loan.getLoanAmount();
+        this.loanDurationYears = loan.getLoanDurationYears();
+        this.rateOfInterestPerAnnum = loan.getRateOfInterestPerAnnum();
+        this.mortgageDetails = loan.getMortgageDetails();
     }
 
     public Long getLoanId() {
@@ -76,9 +94,21 @@ public class Loan {
         this.mortgageDetails = mortgageDetails;
     }
 
+    /*public void addNewEmiPayment(EMI payment) {
+        this.paidEmis.add(payment);
+    }*/
+
+    public List<EMI> getPaidEmis() {
+        return paidEmis;
+    }
+
+    public void setPaidEmis(List<EMI> paidEmis) {
+        this.paidEmis = paidEmis;
+    }
+
     @Override
     public String toString() {
-        return "{\"loanId\": \""+loanId+"\", \"borrowerDetails\": \""+borrowerDetails+"\", \"loanAmount\": \""+loanAmount+"\", \"loanDurationYears\": \""+loanDurationYears+"\", \"rateOfInterestPerAnnum\": \""+rateOfInterestPerAnnum+"\",  \"mortgageDetails\": \""+mortgageDetails+"\"}";
+        return "{\"loanId\": \""+loanId+"\", \"borrowerDetails\": \""+borrowerDetails+"\", \"loanAmount\": \""+loanAmount+"\", \"loanDurationYears\": \""+loanDurationYears+"\", \"rateOfInterestPerAnnum\": \""+rateOfInterestPerAnnum+"\",  \"mortgageDetails\": \""+mortgageDetails+"\", \"numberOfPaidEMIs\": \""+this.paidEmis.size()+"\"}";
     }
 
 }
