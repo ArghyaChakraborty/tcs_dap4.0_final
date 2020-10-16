@@ -51,7 +51,7 @@ public class LoanController {
     public ResponseEntity<String> saveLoan(@RequestBody Loan loan) {
         ResponseEntity<String> responseObj = null;
         try{
-            loan.setLoanId(""+sequenceGenerator.generateSequence(Loan.SEQUENCE_NAME));
+            loan.setLoanId(sequenceGenerator.generateSequence(Loan.SEQUENCE_NAME));
             Loan loanObj = loanRepository.save(loan);
             this.producer.sendMessage(loanObj);
             responseObj = new ResponseEntity<>("Saved Loan details with Id: "+loanObj.getLoanId(), HttpStatus.CREATED);

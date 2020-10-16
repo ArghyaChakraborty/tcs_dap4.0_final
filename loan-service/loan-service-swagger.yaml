@@ -42,7 +42,7 @@ paths:
           name: loanId
           required: true
           schema:
-            type: string
+            type: integer
             example: 123
       description: Retrieves details about a single loan
       responses:
@@ -65,7 +65,7 @@ paths:
           name: loanId
           required: true
           schema:
-            type: string
+            type: integer
             example: 123
       description: Deletes a single loan
       responses:
@@ -99,6 +99,9 @@ components:
         loanDurationYears:
           type: number
           example: 1
+        rateOfInterestPerAnnum:
+          type: number
+          example: 12
         mortgageDetails:
           type: string
           example: Test Mortgage Details
@@ -107,7 +110,7 @@ components:
       description: Loan Object
       properties:
         loanId:
-          type: string
+          type: integer
           example: 1234
         borrowerDetails:
           type: string
@@ -118,6 +121,9 @@ components:
         loanDurationYears:
           type: number
           example: 1
+        rateOfInterestPerAnnum:
+          type: number
+          example: 12
         mortgageDetails:
           type: string
           example: Test Mortgage Details

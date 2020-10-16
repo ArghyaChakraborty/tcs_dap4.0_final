@@ -8,3 +8,6 @@
 
 ## Spring Boot Initializer for the project
 ![Spring Initializer](Loan-Service-Spring-Initializer.JPG)
+
+## Creating Docker Image
+- `docker build -t loan-service:latest .`
